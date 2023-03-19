@@ -1,11 +1,11 @@
 # language-model-challenge
 Application for creating challenging tasks for Large language models
 
-Write a Streamlit application with following featues:
-1. The applicaiton will manage the main object "challenge"
+Write a Streamlit application with following features:
+1. The application will manage the main object "challenge"
 2. Challenges can be of two types Multiple Choice and Subjective evaluation
 3. Multiple Choice challenge:
-  a. Text for Quesiton followed and the multiple choice answers
+  a. Text for Question followed and the multiple choice answers
   b. The correct answer A, B, C... etc,
   c. Explanation fo the correct answer
 
@@ -23,7 +23,7 @@ Write a Streamlit application with following featues:
       - Date the output was created
       - User who submitted the output
       - Model name used
-6. The left panel will have a list of challenges fixed to 20% of he webpage view.
+6. The left panel will have a list of challenges fixed to 20% of the webpage view.
   - Clicking on the challenge will load it to the main panel right 80% view.
 7. The right panel may in view or edit mode. 
   - In view mode challenges are optimized for view. 
