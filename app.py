@@ -81,9 +81,6 @@ class SubjectiveChallenge(Challenge):
         else:
             raise KeyError(f"Key '{key}' not found in SubjectiveChallenge")
 
-# Challenge data structure
-challenges = []
-
 # Function to render multiple choice challenge
 def render_multiple_choice_challenge(challenge):
     st.write(challenge["question"])
@@ -115,8 +112,15 @@ def edit_challenge(challenge):
     elif challenge["type"] == "subjective":
         st.write("Edit subjective challenge properties:")
 
+def add_new_challenge(new_challenge):
+    st.session_state["challenges"].append(new_challenge)
+    st.sidebar.success("Challenge created successfully!")
+    st.session_state["creating_new_challenge"] = False
+
+
 def create_new_challenge_modal():
-    with st.sidebar.expander("Create New Challenge"):
+    with st.form("new_challenge_form"):
+        st.write("Create New Challenge")
         challenge_type = st.selectbox("Challenge Type", options=["Multiple Choice", "Subjective"])
         title = st.text_input("Title", "")
 
@@ -130,36 +134,59 @@ def create_new_challenge_modal():
             summary = st.text_area("Summary", "")
             evaluation_criteria = st.text_area("Evaluation Criteria", "")
 
-        if st.button("Create Challenge"):
-            if challenge_type == "Multiple Choice":
-                new_challenge = MultipleChoiceChallenge(title, question, options, correct_answer, explanation)
-            else:  # Subjective Challenge
-                new_challenge = SubjectiveChallenge(title, prompt, summary, evaluation_criteria)
+        if challenge_type == "Multiple Choice":
+            new_challenge = MultipleChoiceChallenge(title, question, options, correct_answer, explanation)
+        else:  # Subjective Challenge
+            new_challenge = SubjectiveChallenge(title, prompt, summary, evaluation_criteria)
 
-            challenges.append(new_challenge)
-            st.sidebar.success("Challenge created successfully!")
+        st.form_submit_button("Create Challenge", on_click=add_new_challenge, args=(new_challenge,))
+
 
 # Main application
 def main():
     st.title("Large language model challenge creator")
 
-    create_new_challenge_modal()
+    if "creating_new_challenge" not in st.session_state:
+        st.session_state["creating_new_challenge"] = False
+
+    if "challenges" not in st.session_state:
+        st.session_state["challenges"] = []
 
     # Sidebar to display challenges
     st.sidebar.title("Challenges")
-    selected_challenge = st.sidebar.selectbox(
-        "Select a challenge",
-        options=[(i, c["title"]) for i, c in enumerate(challenges)]
-    )
+    add_challenge = st.sidebar.button("Add challenge")
+
+    if add_challenge:
+        st.session_state["creating_new_challenge"] = True
+
+    if st.session_state["creating_new_challenge"]:
+        create_new_challenge_modal()
+
+    # TODO: this does not quite work. need testing
+    if len(st.session_state["challenges"]) > 0:
+        challenges_with_titles = [(i, c["title"]) for i, c in enumerate(st.session_state["challenges"]) if c["title"]]
+
+        if len(challenges_with_titles) > 0:
+            selected_challenge = st.sidebar.selectbox(
+                "Select a challenge",
+                options=challenges_with_titles,
+                format_func=lambda x: x[1]
+            )
+        else:
+            selected_challenge = None
+            st.sidebar.write("No challenges available.")
+    else:
+        selected_challenge = None
+        st.sidebar.write("No challenges available.")
 
     # Main panel
     mode = st.selectbox("Mode", options=["View", "Edit"])
 
-    if selected_challenge is not None:
+    if not st.session_state["creating_new_challenge"] and selected_challenge is not None:
         if mode == "View":
-            render_challenge(challenges[selected_challenge[0]])
+            render_challenge(st.session_state["challenges"][selected_challenge[0]])
         elif mode == "Edit":
-            edit_challenge(challenges[selected_challenge[0]])
+            edit_challenge(st.session_state["challenges"][selected_challenge[0]])
 
 if __name__ == "__main__":
     main()
