@@ -54,6 +54,8 @@ class MultipleChoiceChallenge(Challenge):
             return self.explanation
         elif key == "title":
             return self.title
+        elif key == "challenge_type":
+            return self.challenge_type
         else:
             raise KeyError(f"Key '{key}' not found in MultipleChoiceChallenge")
 
@@ -74,6 +76,8 @@ class SubjectiveChallenge(Challenge):
             return self.evaluation_criteria
         elif key == "title":
             return self.title
+        elif key == "challenge_type":
+            return self.challenge_type
         else:
             raise KeyError(f"Key '{key}' not found in SubjectiveChallenge")
 
@@ -153,9 +157,9 @@ def main():
 
     if selected_challenge is not None:
         if mode == "View":
-            render_challenge(challenges[selected_challenge])
+            render_challenge(challenges[selected_challenge[0]])
         elif mode == "Edit":
-            edit_challenge(challenges[selected_challenge])
+            edit_challenge(challenges[selected_challenge[0]])
 
 if __name__ == "__main__":
     main()
